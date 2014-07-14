@@ -28,6 +28,7 @@ sub scan_tokens {
     my $is_prev_module_name = 0;
     my $is_in_hash          = 0;
     my $does_garbage_exist  = 0;
+    my $hash_count          = 0;
 
     my %result;
     for my $token (@$tokens) {
@@ -58,6 +59,7 @@ sub scan_tokens {
                 $is_prev_module_name = 0;
                 $is_in_hash          = 0;
                 $does_garbage_exist  = 0;
+                $hash_count          = 0;
 
                 next;
             }
@@ -72,7 +74,7 @@ sub scan_tokens {
                 next;
             }
 
-            if ($token_type == DOUBLE || $token_type == INT || $token_type == VERSION_STRING) {
+            if (_is_version($token_type)) {
                 if (!$module_name) {
                     if (!$does_garbage_exist) {
                         # For perl version
@@ -126,20 +128,22 @@ sub scan_tokens {
                 #   use Test::Requires {'Foo' => 1, 'Bar' => 2};
                 elsif ($token_type == LEFT_BRACE ) {
                     $is_in_hash = 1;
+                    $hash_count = 0;
                 }
                 elsif ($token_type == RIGHT_BRACE ) {
                     $is_in_hash = 0;
                 }
                 elsif ($is_in_hash) {
-                    if ($token_type == STRING || $token_type == RAW_STRING) {
-                        $result{$token->{data}} = 0;
+                    if ( _is_string($token_type) || $token_type == KEY || _is_version($token_type) ) {
+                        $hash_count++;
+                        $result{$token->{data}} = 0 if $hash_count % 2;
                     }
                 }
 
                 # For string
                 # e.g.
                 #   use Test::Requires "Foo"
-                elsif ($token_type == STRING || $token_type == RAW_STRING) {
+                elsif (_is_string($token_type)) {
                     $result{$token->{data}} = 0;
                 }
                 next;
@@ -159,7 +163,15 @@ sub scan_tokens {
 }
 
 
+sub _is_string {
+    my $token_type = shift;
+    $token_type == STRING || $token_type == RAW_STRING;
+}
 
+sub _is_version {
+    my $token_type = shift;
+    $token_type == DOUBLE || $token_type == INT || $token_type == VERSION_STRING;
+}
 
 1;
 __END__
