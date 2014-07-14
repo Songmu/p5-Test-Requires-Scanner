@@ -64,7 +64,6 @@ sub scan_tokens {
                 next;
             }
 
-
             # e.g.
             #   use Foo::Bar;
             if ( ($token_type == NAMESPACE || $token_type == NAMESPACE_RESOLVER) && $is_prev_module_name) {
@@ -74,18 +73,13 @@ sub scan_tokens {
                 next;
             }
 
-            if (_is_version($token_type)) {
-                if (!$module_name) {
-                    if (!$does_garbage_exist) {
-                        # For perl version
-                        # e.g.
-                        #   use 5.012;
-                        $is_in_usedecl       = 0;
-                        $is_prev_module_name = 0;
-                        next;
-                    }
-                }
+            if (!$module_name && !$does_garbage_exist && _is_version($token_type)) {
+                # For perl version
+                # e.g.
+                #   use 5.012;
+                $is_in_usedecl       = 0;
                 $is_prev_module_name = 0;
+                next;
             }
 
             # Section for Test::Requires
