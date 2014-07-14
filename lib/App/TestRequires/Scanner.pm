@@ -20,26 +20,22 @@ sub scan_string {
 sub scan_tokens {
     my $tokens = shift;
 
-    my $module_name    = '';
-    my $not_decl_module_name = '';
-
-    my $is_in_reglist       = 0;
+    my $module_name         = '';
     my $is_in_usedecl       = 0;
     my $is_in_test_requires = 0;
+    my $is_in_reglist       = 0;
     my $is_in_list          = 0;
     my $is_prev_module_name = 0;
     my $is_in_hash          = 0;
-
     my $does_garbage_exist  = 0;
 
     my %result;
-  TOP:
     for my $token (@$tokens) {
         my $token_type = $token->{type};
 
         # For use statement
         if ($token_type == USE_DECL) {
-            $is_in_usedecl = 1;
+            $is_in_usedecl       = 1;
             $is_prev_module_name = 1;
             next;
         }
@@ -55,13 +51,13 @@ sub scan_tokens {
             # End of declare of use statement
             if ($token_type == SEMI_COLON) {
                 $module_name         = '';
-                $is_in_reglist       = 0;
-                $is_in_test_requires = 0;
-                $is_in_list          = 0;
                 $is_in_usedecl       = 0;
-                $does_garbage_exist  = 0;
+                $is_in_test_requires = 0;
+                $is_in_reglist       = 0;
+                $is_in_list          = 0;
                 $is_prev_module_name = 0;
                 $is_in_hash          = 0;
+                $does_garbage_exist  = 0;
 
                 next;
             }
@@ -82,12 +78,11 @@ sub scan_tokens {
                         # For perl version
                         # e.g.
                         #   use 5.012;
-                        $is_in_usedecl = 0;
+                        $is_in_usedecl       = 0;
                         $is_prev_module_name = 0;
                         next;
                     }
                 }
-
                 $is_prev_module_name = 0;
             }
 
