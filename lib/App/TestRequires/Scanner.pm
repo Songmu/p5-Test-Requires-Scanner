@@ -23,6 +23,19 @@ sub scan_file {
    $class->scan_string($content);
 }
 
+sub scan_files {
+    my ($class, @files) = @_;
+
+    my $result = App::TestRequires::Scanner::Result->new;
+
+    for my $file (@files) {
+        my $ret = App::TestRequires::Scanner->scan_file($file);
+        $result->save_module($_, $ret->{$_}) for keys %$ret;
+    }
+
+    $result->modules;
+}
+
 sub scan_string {
     my ($class, $string) = @_;
 
