@@ -5,16 +5,16 @@ use Test::More;
 
 use App::TestRequires::Scanner;
 
-my $ret = App::TestRequires::Scanner::scan_string('use Test::Requires 0.99 {"DBI" => 1};');
+my $ret = App::TestRequires::Scanner->scan_string('use Test::Requires 0.99 {"DBI" => 1};');
 is_deeply [keys %$ret], ['DBI'];
 
-$ret = App::TestRequires::Scanner::scan_string('use Test::Requires {DBI => "1"};');
+$ret = App::TestRequires::Scanner->scan_string('use Test::Requires {DBI => "1"};');
 is_deeply [keys %$ret], ['DBI'];
 
-$ret = App::TestRequires::Scanner::scan_string('use Test::Requires 0.99 "DBI";');
+$ret = App::TestRequires::Scanner->scan_string('use Test::Requires 0.99 "DBI";');
 is_deeply [keys %$ret], ['DBI'];
 
-$ret = App::TestRequires::Scanner::scan_string('use Test::Requires 0.99 ("DBI");');
+$ret = App::TestRequires::Scanner->scan_string('use Test::Requires 0.99 ("DBI");');
 is_deeply [keys %$ret], ['DBI'];
 
 done_testing;

@@ -9,16 +9,16 @@ use Compiler::Lexer;
 use App::TestRequires::Scanner::Constants;
 
 sub scan_string {
-    my $string = shift;
+    my ($class, $string) = @_;
 
     my $lexer = Compiler::Lexer->new;
     my $tokens = $lexer->tokenize($string);
 
-    scan_tokens($tokens);
+    $class->scan_tokens($tokens);
 }
 
 sub scan_tokens {
-    my $tokens = shift;
+    my ($class, $tokens) = @_;
 
     my $module_name         = '';
     my $is_in_usedecl       = 0;
