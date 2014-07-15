@@ -93,7 +93,6 @@ sub scan_tokens {
                     # skip regdelim
                     if ($token_type == REG_EXP) {
                         for my $_module_name (split /\s+/, $token->{data}) {
-                            # version->parse($_->{version})->numify
                             $result->save_module($_module_name);
                         }
                         $walker->is_in_reglist(0);
