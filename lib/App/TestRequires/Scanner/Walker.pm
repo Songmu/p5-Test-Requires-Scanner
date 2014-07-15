@@ -1,7 +1,6 @@
 package App::TestRequires::Scanner::Walker;
 use strict;
 use warnings;
-use utf8;
 
 use Class::Accessor::Lite (
     new => 1,
@@ -18,7 +17,6 @@ use Class::Accessor::Lite (
         stashed_module
     /],
 );
-
 
 sub reset {
     my $self = shift;

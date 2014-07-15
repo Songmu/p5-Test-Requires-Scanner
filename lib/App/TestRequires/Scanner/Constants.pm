@@ -1,7 +1,6 @@
 package App::TestRequires::Scanner::Constants;
 use strict;
 use warnings;
-use utf8;
 
 use Compiler::Lexer::Constants;
 

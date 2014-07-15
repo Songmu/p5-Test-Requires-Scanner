@@ -6,8 +6,10 @@ use warnings;
 our $VERSION = "0.01";
 
 use Compiler::Lexer;
+
 use App::TestRequires::Scanner::Constants;
 use App::TestRequires::Scanner::Walker;
+use App::TestRequires::Scanner::Result;
 
 sub scan_string {
     my ($class, $string) = @_;
@@ -22,8 +24,7 @@ sub scan_tokens {
     my ($class, $tokens) = @_;
 
     my $walker = App::TestRequires::Scanner::Walker->new;
-
-    my %result;
+    my $result = App::TestRequires::Scanner::Result->new;
     for my $token (@$tokens) {
         my $token_type = $token->{type};
 
@@ -80,7 +81,8 @@ sub scan_tokens {
                     # skip regdelim
                     if ($token_type == REG_EXP) {
                         for my $_module_name (split /\s+/, $token->{data}) {
-                            $result{$_module_name} = 0;
+                            # version->parse($_->{version})->numify
+                            $result->save_module($_module_name);
                         }
                         $walker->is_in_reglist(0);
                     }
@@ -97,7 +99,7 @@ sub scan_tokens {
                 }
                 elsif ($walker->is_in_list) {
                     if ($token_type == STRING || $token_type == RAW_STRING) {
-                        $result{$token->{data}} = 0;
+                        $result->save_module($token->{data});
                     }
                 }
 
@@ -120,7 +122,7 @@ sub scan_tokens {
                         }
                         else {
                             # store version
-                            $result{$walker->stashed_module} = $token->{data};
+                            $result->save_module($walker->stashed_module, $token->{data});
                             $walker->stashed_module('');
                         }
                     }
@@ -130,7 +132,7 @@ sub scan_tokens {
                 # e.g.
                 #   use Test::Requires "Foo"
                 elsif (_is_string($token_type)) {
-                    $result{$token->{data}} = 0;
+                    $result->save_module($token->{data});
                 }
                 next;
             }
@@ -141,10 +143,9 @@ sub scan_tokens {
             }
             next;
         }
-
     }
 
-    \%result;
+    $result->modules;
 }
 
 
