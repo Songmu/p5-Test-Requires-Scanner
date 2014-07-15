@@ -42,7 +42,12 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.008001"
+            "Class::Accessor::Lite" : "0",
+            "Compiler::Lexer" : "0",
+            "Const::Common" : "0",
+            "File::Zglob" : "0",
+            "perl" : "5.008001",
+            "version" : "0.77"
          }
       },
       "test" : {
@@ -52,6 +57,17 @@
       }
    },
    "release_status" : "unstable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Songmu/p5-App-TestRequires-Scanner/issues"
+      },
+      "homepage" : "https://github.com/Songmu/p5-App-TestRequires-Scanner",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Songmu/p5-App-TestRequires-Scanner.git",
+         "web" : "https://github.com/Songmu/p5-App-TestRequires-Scanner"
+      }
+   },
    "version" : "0.01",
    "x_authority" : "cpan:SONGMU"
 }

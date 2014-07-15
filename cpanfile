@@ -1,6 +1,7 @@
 requires 'Class::Accessor::Lite';
 requires 'Compiler::Lexer';
 requires 'Const::Common';
+requires 'File::Zglob';
 requires 'perl', '5.008001';
 requires 'version', '0.77';
 
