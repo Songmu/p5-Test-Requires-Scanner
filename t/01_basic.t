@@ -14,7 +14,9 @@ is_deeply [keys %$ret], ['DBI'];
 $ret = App::TestRequires::Scanner->scan_string('use Test::Requires 0.99 "DBI";');
 is_deeply [keys %$ret], ['DBI'];
 
-$ret = App::TestRequires::Scanner->scan_string('use Test::Requires 0.99 ("DBI");');
+$ret = App::TestRequires::Scanner->scan_string('use Test::Requires 0.99 ("DBI");
+use Test::More 0.98'
+);
 is_deeply [keys %$ret], ['DBI'];
 
 done_testing;

@@ -36,14 +36,10 @@ sub scan_tokens {
         if ($walker->is_in_usedecl) {
             # e.g.
             #   use Foo;
-            if ($token_type == USED_NAME) {
-                $walker->{module_name} = $token->{data};
-                $walker->is_prev_module_name(1);
-                next;
-            }
-
-            # End of declare of use statement
-            if ($token_type == SEMI_COLON) {
+            if (
+                $token_type == USED_NAME ||  # e.g. use Foo
+                $token_type == SEMI_COLON    # End of declare of use statement
+            ) {
                 $walker->reset;
                 next;
             }
@@ -52,8 +48,13 @@ sub scan_tokens {
             #   use Foo::Bar;
             if ( ($token_type == NAMESPACE || $token_type == NAMESPACE_RESOLVER) && $walker->is_prev_module_name) {
                 $walker->{module_name} .= $token->{data};
-                $walker->is_prev_module_name(1);
-                $walker->is_in_test_requires($walker->module_name eq 'Test::Requires');
+                if ($walker->module_name =~ /^Test(?:\:\:(?:Requires)?)?$/) {
+                    $walker->is_prev_module_name(1);
+                    $walker->is_in_test_requires($walker->module_name eq 'Test::Requires');
+                }
+                else {
+                    $walker->reset;
+                }
                 next;
             }
 
@@ -125,7 +126,6 @@ sub scan_tokens {
                 }
                 next;
             }
-
 
             if ($token_type != WHITESPACE) {
                 $walker->does_garbage_exist(1);
