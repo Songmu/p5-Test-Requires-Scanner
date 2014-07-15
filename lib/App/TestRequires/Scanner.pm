@@ -7,6 +7,7 @@ our $VERSION = "0.01";
 
 use Compiler::Lexer;
 use App::TestRequires::Scanner::Constants;
+use App::TestRequires::Scanner::Walker;
 
 sub scan_string {
     my ($class, $string) = @_;
@@ -20,15 +21,7 @@ sub scan_string {
 sub scan_tokens {
     my ($class, $tokens) = @_;
 
-    my $module_name         = '';
-    my $is_in_usedecl       = 0;
-    my $is_in_test_requires = 0;
-    my $is_in_reglist       = 0;
-    my $is_in_list          = 0;
-    my $is_prev_module_name = 0;
-    my $is_in_hash          = 0;
-    my $does_garbage_exist  = 0;
-    my $hash_count          = 0;
+    my $walker = App::TestRequires::Scanner::Walker->new;
 
     my %result;
     for my $token (@$tokens) {
@@ -36,69 +29,59 @@ sub scan_tokens {
 
         # For use statement
         if ($token_type == USE_DECL) {
-            $is_in_usedecl       = 1;
-            $is_prev_module_name = 1;
+            $walker->is_in_usedecl(1);
+            $walker->is_prev_module_name(1);
             next;
         }
-        if ($is_in_usedecl) {
+        if ($walker->is_in_usedecl) {
             # e.g.
             #   use Foo;
             if ($token_type == USED_NAME) {
-                $module_name = $token->{data};
-                $is_prev_module_name = 1;
+                $walker->{module_name} = $token->{data};
+                $walker->is_prev_module_name(1);
                 next;
             }
 
             # End of declare of use statement
             if ($token_type == SEMI_COLON) {
-                $module_name         = '';
-                $is_in_usedecl       = 0;
-                $is_in_test_requires = 0;
-                $is_in_reglist       = 0;
-                $is_in_list          = 0;
-                $is_prev_module_name = 0;
-                $is_in_hash          = 0;
-                $does_garbage_exist  = 0;
-                $hash_count          = 0;
-
+                $walker->reset;
                 next;
             }
 
             # e.g.
             #   use Foo::Bar;
-            if ( ($token_type == NAMESPACE || $token_type == NAMESPACE_RESOLVER) && $is_prev_module_name) {
-                $module_name .= $token->{data};
-                $is_prev_module_name = 1;
-                $is_in_test_requires = $module_name eq 'Test::Requires';
+            if ( ($token_type == NAMESPACE || $token_type == NAMESPACE_RESOLVER) && $walker->is_prev_module_name) {
+                $walker->{module_name} .= $token->{data};
+                $walker->is_prev_module_name(1);
+                $walker->is_in_test_requires($walker->module_name eq 'Test::Requires');
                 next;
             }
 
-            if (!$module_name && !$does_garbage_exist && _is_version($token_type)) {
+            if (!$walker->module_name && !$walker->does_garbage_exist && _is_version($token_type)) {
                 # For perl version
                 # e.g.
                 #   use 5.012;
-                $is_in_usedecl       = 0;
-                $is_prev_module_name = 0;
+                $walker->reset;
                 next;
             }
 
             # Section for Test::Requires
-            if ($is_in_test_requires) {
-                $is_prev_module_name = 0;
+            if ($walker->is_in_test_requires) {
+                $walker->is_prev_module_name(0);
 
                 # For qw() notation
                 # e.g.
                 #   use Test::Requires qw/Foo Bar/;
                 if ($token_type == REG_LIST) {
-                    $is_in_reglist = 1;
+                    $walker->is_in_reglist(1);
                 }
-                elsif ($is_in_reglist) {
+                elsif ($walker->is_in_reglist) {
                     # skip regdelim
                     if ($token_type == REG_EXP) {
                         for my $_module_name (split /\s+/, $token->{data}) {
                             $result{$_module_name} = 0;
                         }
-                        $is_in_reglist = 0;
+                        $walker->is_in_reglist(0);
                     }
                 }
 
@@ -106,12 +89,12 @@ sub scan_tokens {
                 # e.g.
                 #   use Test::Requires ('Foo', 'Bar');
                 elsif ($token_type == LEFT_PAREN) {
-                    $is_in_list = 1;
+                    $walker->is_in_list(1);
                 }
                 elsif ($token_type == RIGHT_PAREN) {
-                    $is_in_list = 0;
+                    $walker->is_in_list(0);
                 }
-                elsif ($is_in_list) {
+                elsif ($walker->is_in_list) {
                     if ($token_type == STRING || $token_type == RAW_STRING) {
                         $result{$token->{data}} = 0;
                     }
@@ -121,16 +104,16 @@ sub scan_tokens {
                 # e.g.
                 #   use Test::Requires {'Foo' => 1, 'Bar' => 2};
                 elsif ($token_type == LEFT_BRACE ) {
-                    $is_in_hash = 1;
-                    $hash_count = 0;
+                    $walker->is_in_hash(1);
+                    $walker->hash_count(0);
                 }
                 elsif ($token_type == RIGHT_BRACE ) {
-                    $is_in_hash = 0;
+                    $walker->is_in_hash(0);
                 }
-                elsif ($is_in_hash) {
+                elsif ($walker->is_in_hash) {
                     if ( _is_string($token_type) || $token_type == KEY || _is_version($token_type) ) {
-                        $hash_count++;
-                        $result{$token->{data}} = 0 if $hash_count % 2;
+                        $walker->{hash_count}++;
+                        $result{$token->{data}} = 0 if $walker->hash_count % 2;
                     }
                 }
 
@@ -145,8 +128,8 @@ sub scan_tokens {
 
 
             if ($token_type != WHITESPACE) {
-                $does_garbage_exist  = 1;
-                $is_prev_module_name = 0;
+                $walker->does_garbage_exist(1);
+                $walker->is_prev_module_name(0);
             }
             next;
         }
