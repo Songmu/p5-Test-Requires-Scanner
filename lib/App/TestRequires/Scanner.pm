@@ -11,6 +11,18 @@ use App::TestRequires::Scanner::Constants;
 use App::TestRequires::Scanner::Walker;
 use App::TestRequires::Scanner::Result;
 
+sub scan_file {
+    my ($class, $file) = @_;
+
+    my $content = do {
+        local $/;
+        open my $fh, '<', $file or die $!;
+        <$fh>;
+    };
+
+   $class->scan_string($content);
+}
+
 sub scan_string {
     my ($class, $string) = @_;
 
