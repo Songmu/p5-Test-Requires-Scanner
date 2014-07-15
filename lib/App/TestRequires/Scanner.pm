@@ -58,7 +58,7 @@ sub scan_tokens {
                 next;
             }
 
-            if (!$walker->module_name && !$walker->does_garbage_exist && _is_version($token_type)) {
+            if (!$walker->module_name && !$walker->does_garbage_exist && _looks_like_version($token_type)) {
                 # For perl version
                 # e.g.
                 #   use 5.012;
@@ -112,9 +112,17 @@ sub scan_tokens {
                     $walker->is_in_hash(0);
                 }
                 elsif ($walker->is_in_hash) {
-                    if ( _is_string($token_type) || $token_type == KEY || _is_version($token_type) ) {
+                    if ( _is_string($token_type) || $token_type == KEY || _looks_like_version($token_type) ) {
                         $walker->{hash_count}++;
-                        $result{$token->{data}} = 0 if $walker->hash_count % 2;
+
+                        if ($walker->hash_count % 2) {
+                            $walker->stashed_module($token->{data});
+                        }
+                        else {
+                            # store version
+                            $result{$walker->stashed_module} = $token->{data};
+                            $walker->stashed_module('');
+                        }
                     }
                 }
 
@@ -145,7 +153,7 @@ sub _is_string {
     $token_type == STRING || $token_type == RAW_STRING;
 }
 
-sub _is_version {
+sub _looks_like_version {
     my $token_type = shift;
     $token_type == DOUBLE || $token_type == INT || $token_type == VERSION_STRING;
 }

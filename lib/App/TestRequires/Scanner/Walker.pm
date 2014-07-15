@@ -15,6 +15,7 @@ use Class::Accessor::Lite (
         is_in_hash
         does_garbage_exist
         hash_count
+        stashed_module
     /],
 );
 
@@ -23,6 +24,7 @@ sub reset {
     my $self = shift;
 
     $self->module_name('');
+    $self->stashed_module('');
 
     for my $accessor (qw/
         is_in_usedecl
