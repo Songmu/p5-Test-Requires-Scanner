@@ -1,0 +1,5 @@
+#!perl
+use strict;
+use warnings;
+use App::TestRequires::Scanner::CLI;
+App::TestRequires::Scanner::CLI->run(@ARGV);
