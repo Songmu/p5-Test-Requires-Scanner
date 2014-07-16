@@ -1,4 +1,4 @@
-package App::TestRequires::Scanner;
+package Test::Requires::Scanner;
 use 5.008001;
 use strict;
 use warnings;
@@ -29,7 +29,7 @@ sub scan_files {
     my $result = App::TestRequires::Scanner::Result->new;
 
     for my $file (@files) {
-        my $ret = App::TestRequires::Scanner->scan_file($file);
+        my $ret = Test::Requires::Scanner->scan_file($file);
         $result->save_module($_, $ret->{$_}) for keys %$ret;
     }
 
@@ -190,11 +190,11 @@ __END__
 
 =head1 NAME
 
-App::TestRequires::Scanner - It's new $module
+Test::Requires::Scanner - It's new $module
 
 =head1 SYNOPSIS
 
-    use App::TestRequires::Scanner;
+    use Test::Requires::Scanner;
 
 =head1 DESCRIPTION
 

@@ -3,14 +3,14 @@ use warnings;
 use utf8;
 use Test::More;
 
-use App::TestRequires::Scanner;
+use Test::Requires::Scanner;
 
 my $content = do {
     local $/;
     <DATA>
 };
 
-my $ret = App::TestRequires::Scanner->scan_string($content);
+my $ret = Test::Requires::Scanner->scan_string($content);
 
 is_deeply $ret, {
     'DBI'               => undef,

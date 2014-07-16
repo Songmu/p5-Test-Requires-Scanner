@@ -1,4 +1,4 @@
-package App::TestRequires::Scanner::Result;
+package Test::Requires::Scanner::Result;
 use strict;
 use warnings;
 

@@ -1,10 +1,10 @@
 # NAME
 
-App::TestRequires::Scanner - It's new $module
+Test::Requires::Scanner - It's new $module
 
 # SYNOPSIS
 
-    use App::TestRequires::Scanner;
+    use Test::Requires::Scanner;
 
 # DESCRIPTION
 

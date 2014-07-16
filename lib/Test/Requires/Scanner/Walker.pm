@@ -1,4 +1,4 @@
-package App::TestRequires::Scanner::Walker;
+package Test::Requires::Scanner::Walker;
 use strict;
 use warnings;
 

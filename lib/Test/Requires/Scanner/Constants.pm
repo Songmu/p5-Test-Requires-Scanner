@@ -1,4 +1,4 @@
-package App::TestRequires::Scanner::Constants;
+package Test::Requires::Scanner::Constants;
 use strict;
 use warnings;
 
