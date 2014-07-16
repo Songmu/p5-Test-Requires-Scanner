@@ -1,14 +1,24 @@
 # NAME
 
-Test::Requires::Scanner - It's new $module
+Test::Requires::Scanner - retrieve modules specified by Test::Requires
 
 # SYNOPSIS
 
     use Test::Requires::Scanner;
+    my $modules2version_hashref = Test::Requires::Scanner->scan_files('t/hoge.t', 't/fuga.t');
 
 # DESCRIPTION
 
-App::TestRequires::Scanner is ...
+App::TestRequires::Scanner is to retrieve modules specified by [Test::Requires](https://metacpan.org/pod/Test::Requires) in
+test files. It is useful for CPAN module maintainer.
+
+## METHODS
+
+- `$hashref = Test::Requires::Scanner->scan_string($str)`
+- `$hashref = Test::Requires::Scanner->scan_file($file)`
+- `$hashref = Test::Requires::Scanner->scan_files(@files)`
+
+    A key of `$hashref` is module name and a value is version.
 
 # LICENSE
 

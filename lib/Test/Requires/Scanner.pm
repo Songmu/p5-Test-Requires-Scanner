@@ -7,9 +7,9 @@ our $VERSION = "0.01";
 
 use Compiler::Lexer;
 
-use App::TestRequires::Scanner::Constants;
-use App::TestRequires::Scanner::Walker;
-use App::TestRequires::Scanner::Result;
+use Test::Requires::Scanner::Constants;
+use Test::Requires::Scanner::Walker;
+use Test::Requires::Scanner::Result;
 
 sub scan_file {
     my ($class, $file) = @_;
@@ -26,7 +26,7 @@ sub scan_file {
 sub scan_files {
     my ($class, @files) = @_;
 
-    my $result = App::TestRequires::Scanner::Result->new;
+    my $result = Test::Requires::Scanner::Result->new;
 
     for my $file (@files) {
         my $ret = Test::Requires::Scanner->scan_file($file);
@@ -48,8 +48,8 @@ sub scan_string {
 sub scan_tokens {
     my ($class, $tokens) = @_;
 
-    my $walker = App::TestRequires::Scanner::Walker->new;
-    my $result = App::TestRequires::Scanner::Result->new;
+    my $walker = Test::Requires::Scanner::Walker->new;
+    my $result = Test::Requires::Scanner::Result->new;
     for my $token (@$tokens) {
         my $token_type = $token->{type};
 
@@ -190,15 +190,31 @@ __END__
 
 =head1 NAME
 
-Test::Requires::Scanner - It's new $module
+Test::Requires::Scanner - retrieve modules specified by Test::Requires
 
 =head1 SYNOPSIS
 
     use Test::Requires::Scanner;
+    my $modules2version_hashref = Test::Requires::Scanner->scan_files('t/hoge.t', 't/fuga.t');
 
 =head1 DESCRIPTION
 
-App::TestRequires::Scanner is ...
+App::TestRequires::Scanner is to retrieve modules specified by L<Test::Requires> in
+test files. It is useful for CPAN module maintainer.
+
+=head2 METHODS
+
+=over
+
+=item C<< $hashref = Test::Requires::Scanner->scan_string($str) >>
+
+=item C<< $hashref = Test::Requires::Scanner->scan_file($file) >>
+
+=item C<< $hashref = Test::Requires::Scanner->scan_files(@files) >>
+
+A key of C<$hashref> is module name and a value is version.
+
+=back
 
 =head1 LICENSE
 
